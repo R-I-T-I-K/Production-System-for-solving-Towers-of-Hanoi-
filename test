@@ -1,0 +1,302 @@
+import pyttsx3 
+import speech_recognition as sr 
+import datetime
+import wikipedia 
+import webbrowser
+import os
+import smtplib
+import sys
+import urllib.request
+import urllib.parse
+import re
+import time
+import cv2
+
+
+
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+
+engine.setProperty('voice', voices[0].id)
+
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if hour>=0 and hour<12:
+        speak("Good Morning!")
+
+    elif hour>=12 and hour<18:
+        speak("Good Afternoon!")   
+
+    else:
+        speak("Good Evening!")  
+
+    speak("I am Luckyboy. how may i help you")   
+    
+       
+def takeCommand():
+    
+
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+
+    try:
+        print("Recognizing...")    
+        query = r.recognize_google(audio, language='en-in')
+        print(f"User said: {query}\n")
+
+    except Exception as e:    
+        print("Say that again please...")  
+        return "None"
+    return query
+
+def sendEmail(to, content):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login('youremail@gmail.com', 'your-password')
+    server.sendmail('youremail@gmail.com', to, content)
+    server.close()
+
+def music():
+    music_dir = 'E:\\songs'
+    songs = os.listdir(music_dir)
+    print(songs)
+    speak("what song should i play?")
+    lol=takeCommand()
+    if 'first' in lol:
+        os.startfile(os.path.join(music_dir, songs[0]))
+    elif 'second' in lol:
+        os.startfile(os.path.join(music_dir, songs[1]))
+    else:
+        speak("i am sorry cant play the song")
+        
+    
+            
+def add():
+    speak("tell me the first number")
+    tnum1=takeCommand()
+    num1=int(tnum1)
+    speak("tell me the second number")
+    tnum2=takeCommand()
+    num2=int(tnum2)
+    adder=num1+num2
+    adders=str(adder)
+    speak(f"the sum is :"+ adders)
+    
+def sub():
+    speak("tell me the first number")
+    tnum3=takeCommand()
+    num3=int(tnum3)
+    speak("tell me the second number")
+    tnum4=takeCommand()
+    num4=int(tnum4)
+    subt=num1-num2
+    subts=str(subt)
+    speak(f"the subtraction  is :"+ subts)
+
+    
+    
+def mul():
+    speak("tell me the first number")
+    tnum5=takeCommand()
+    num5=int(tnum5)
+    speak("tell me the second number")
+    tnum6=takeCommand()
+    num6=int(tnum6)
+    mult=num5*num6
+    mults=str(mult)
+    speak(f"the multiplication is :"+ mults)    
+    
+    
+    
+    
+def div():
+    try:
+        speak("tell me the divident number")
+        tnum7=takeCommand()
+        num7=int(tnum7)
+        speak("tell me the divisor number")
+        tnum8=takeCommand()
+        num8=int(tnum8)
+        divi=num7/num8
+        divis=str(divi)
+        speak(f"the questiont is :"+ divis) 
+        
+    
+    except Exception as e:
+        speak("listen you you son of a bitch")
+        
+     
+    
+    
+    
+    
+def camera():
+    
+    speak("press escape key to close camera")
+    cv2.namedWindow("preview")
+    vc = cv2.VideoCapture(0)
+
+    if vc.isOpened():
+        
+        rval, frame = vc.read()
+    else:
+        
+        rval = False
+
+    while rval:
+        cv2.imshow("preview", frame)
+        rval, frame = vc.read()
+        key = cv2.waitKey(20)
+        if key == 27:
+             break
+            
+       
+    cv2.destroyWindow("preview")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+if __name__ == "__main__":
+    wishMe()
+    while True:
+    
+        query = takeCommand().lower()
+
+        
+        if 'tell me about' in query:
+            speak('Searching Wikipedia...')
+            query = query.replace("who is", "")
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to Wikipedia")
+            print(results)
+            speak(results)
+
+        elif 'open youtube' in query:
+            
+            query_string = urllib.parse.urlencode({"search_query" : input()})
+            html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
+            search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+            print("http://www.youtube.com/watch?v=" + search_results[0])
+            speak("here is the link for your search")
+            
+        elif 'open google' in query:
+            webbrowser.open("google.com")
+
+        elif 'open stackoverflow' in query:
+            webbrowser.open("stackoverflow.com")   
+            
+
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")    
+            speak(f"Sir, the time is {strTime}")
+
+        elif 'open nfs' in query:
+            codePath ="E:\\Mr DJ\\Need For Speed Rivals\\NFS14.exe"
+            os.startfile(codePath)
+
+        elif 'email to harry' in query:
+            try:
+                speak("What should I say?")
+                content = takeCommand()
+                to = "harryyourEmail@gmail.com"    
+                sendEmail(to, content)
+                speak("Email has been sent!")
+            except Exception as e:
+                print(e)
+                speak("Sorry my lord Gulshan. I am not able to send this email") 
+        
+  
+        elif 'die' in query:
+            speak("going down")
+            sys.exit()
+            
+            
+        elif 'browse' in query:
+            speak("what should i search?")
+            new=2
+            taburl="http://google.com/?#q=";
+            term=takeCommand();
+            webbrowser.open(taburl+term,new=new);
+        
+        elif 'close internet explorer' in query:
+            
+            os.system("taskkill /f /im iexplore.exe")
+                
+                
+        elif 'shutdown system' in query:
+            os.system("shutdown /s /t 1")
+            
+        elif 'play music' in query:
+            music()
+            
+        elif 'add' in query:
+            add()
+      
+        elif 'subtract' in query:
+            sub()
+            
+        elif 'multiply' in query:
+            mul()
+            
+        elif 'divide' in query:
+            div()
+            
+        
+        
+        elif 'open camera' in query:
+            camera()
+            
+            
+            
+            
+            
+         
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
